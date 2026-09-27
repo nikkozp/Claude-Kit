@@ -61,6 +61,6 @@ of this one.
 - Always end an implementation task with a build + relevant tests before handing to the gate.
 - Read-only agents (`ba`, `ddd-architect`, `devil`, `reviewer`, `security-scanner`) never edit
   code; they report and route.
-- Version control follows `.claude/rules/git-operations.md`: `git commit` is allowed only when
-  the user explicitly asks for it in the current message (always review the staged diff first);
-  `git push` is forbidden with no exception.
+- Version control follows `.claude/rules/git-operations.md`: work on a `feature/*` branch created
+  from the freshly pulled main, commit and push that branch (`git push -u origin HEAD`), never push
+  to main and never force. The global git-guard hook enforces this.

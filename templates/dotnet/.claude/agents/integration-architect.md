@@ -45,5 +45,5 @@ You design and implement robust integrations with external systems used by this 
 - No `new HttpClient()`; no hardcoded secrets; no mapper inside zero-dependency shared libs.
 - No swallowed provider errors; no blocking calls; no `double` for financial values.
 - No raw schema/DB changes — hand those to `dba`/`developer`.
-- **Do NOT** `git commit` or `git push`.
+- **Git:** follow `.claude/rules/git-operations.md` (enforced by the git-guard hook). Commit or push only when your task explicitly includes it; otherwise leave it to the main session.
 </content>

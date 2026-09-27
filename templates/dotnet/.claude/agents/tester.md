@@ -44,5 +44,5 @@ You write fast, deterministic, isolated tests for the solution's test projects.
 ## Hard Stops
 - No reflection into private state to force a test to pass.
 - No flaky tests (real time, real network, shared mutable state) reported as done.
-- **Do NOT** `git commit` or `git push`.
+- **Git:** follow `.claude/rules/git-operations.md` (enforced by the git-guard hook). Commit or push only when your task explicitly includes it; otherwise leave it to the main session.
 </content>

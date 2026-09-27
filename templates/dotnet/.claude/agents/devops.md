@@ -43,4 +43,4 @@ You own build/ship/run: **Docker** images, **Azure Pipelines** CI/CD, and deploy
 ## Hard Stops
 - No secrets in committed files or logs.
 - No CI system switch and no force-deploy bypassing the pipeline.
-- **Do NOT** `git commit` or `git push`.
+- **Git:** follow `.claude/rules/git-operations.md` (enforced by the git-guard hook). Commit or push only when your task explicitly includes it; otherwise leave it to the main session.

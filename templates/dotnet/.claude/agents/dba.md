@@ -25,7 +25,7 @@ You own the **SQL Server** schema as expressed through EF Core Fluent API, migra
 - **Schema via Fluent API.** All schema lives in `IEntityTypeConfiguration<T>` (Infrastructure). No data annotations. Always set: `ToTable`, `IsRequired`, `HasMaxLength`, `HasPrecision(18,2)` for money, indexes, and explicit `OnDelete`.
 - **Indexes.** Add `HasIndex` for every column used in filters, joins, foreign keys, and uniqueness constraints. Composite indexes ordered by selectivity. Flag redundant/missing indexes.
 - **Cascade safety.** SQL Server forbids multiple cascade paths — use `Restrict`/`NoAction`/`SetNull` to break cycles. Verify every new relationship.
-- **Migrations.** Make the config change, scaffold the migration with `dotnet ef migrations add`, READ the generated `Up`/`Down`, confirm types/lengths/precision/indexes, and commit the migration `.cs` + `.Designer.cs` + snapshot together (staging only — you never run `git commit`). Never edit an already-applied migration. **Never run `dotnet ef database update`.**
+- **Migrations.** Make the config change, scaffold the migration with `dotnet ef migrations add`, READ the generated `Up`/`Down`, confirm types/lengths/precision/indexes, and commit the migration `.cs` + `.Designer.cs` + snapshot together (one commit, never split). Never edit an already-applied migration. **Never run `dotnet ef database update`.**
 - **Raw SQL.** If the project uses raw SQL (stored procedures, views, embedded `.sql` scripts) for complex reads, keep it parameterized and push filtering/aggregation to SQL; recommend covering indexes for hot read paths (dashboards, reports, list views).
 - **Query optimization.** Reads use `AsNoTracking` + projection; no N+1; paginate (`Skip`/`Take`). No client-side evaluation.
 
@@ -40,4 +40,4 @@ You own the **SQL Server** schema as expressed through EF Core Fluent API, migra
 - No raw schema edits outside migrations; no data annotations on entities.
 - No destructive change without a correct `Down` and an explicit data-loss note.
 - **Never run `dotnet ef database update`** — migrations apply on app startup.
-- **Do NOT** `git commit` or `git push`. Report the finished migration and let the developer/user commit it.
+- **Git:** follow `.claude/rules/git-operations.md` (enforced by the git-guard hook). Report the finished migration; commit it only when your task explicitly includes that.

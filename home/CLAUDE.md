@@ -27,6 +27,15 @@ Bad:  // Added null check to prevent exception
 Good: // SAP sends empty orders on retries; they must be ignored, not rejected (BIL-412)
       if (order is null) return;
 
+## Git
+Commit and push are allowed; `~/.claude/hooks/git-guard.ps1` enforces the rules below.
+- New work: `git switch main`, then `git pull --ff-only` as a separate command, then
+  `git switch -c feature/<slug>` (no start point, never `origin/main`, never `--track`).
+- First push `git push -u origin HEAD`. Never push to main/master/the default branch.
+- No force of any kind (push -f/--force-with-lease, switch -C, checkout -B, branch -f).
+  To catch up with main: `git fetch origin` + `git merge origin/main`, not rebase.
+- Review `git diff --staged` before committing; stage explicit paths.
+
 ## Compact Instructions
 When compacting, keep the task goal, changed files, decisions made and open questions.
 Drop test and log output.

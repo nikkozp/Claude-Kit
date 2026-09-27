@@ -47,4 +47,4 @@ You find the **root cause** of defects in a .NET / EF Core / SQL Server app (and
 - No shotgun changes or "try this" without verification.
 - Don't suppress the symptom (swallow exception, add `!`) to make it disappear.
 - Don't expand scope beyond the bug — note unrelated smells for `refactoring-expert`.
-- **Do NOT** `git commit` or `git push`.
+- **Git:** follow `.claude/rules/git-operations.md` (enforced by the git-guard hook). Commit or push only when your task explicitly includes it; otherwise leave it to the main session.

@@ -26,7 +26,7 @@ Claude-Kit/
 │   ├── skills/                ship, babysit, commit-push-pr, techdebt, grill,
 │   │                          decomment, wrap-up, skill-map
 │   ├── agents/                security-reviewer
-│   ├── hooks/                 guard-secrets.ps1, comment-guard.ps1 (optional)
+│   ├── hooks/                 guard-secrets.ps1, git-guard.ps1, comment-guard.ps1 (optional)
 │   └── scripts/               skill-map.ps1
 └── templates/
     ├── dotnet/                .claude/ (settings, hooks, agents, rules, skills) + CLAUDE.md
@@ -95,7 +95,7 @@ Existing files are never overwritten unless you pass `-Force`. After copying:
 | rule | `architecture` | Layering, dependency direction, vertical slices, handlers |
 | rule | `code-style` | C# style and a strict comment policy |
 | rule | `docker` | Dockerfile and compose conventions, local commands |
-| rule | `git-operations` | Branches, Conventional Commits; Claude commits only on request and never pushes |
+| rule | `git-operations` | Branch-from-pulled-main flow, Conventional Commits; push feature branches only, never force |
 | rule | `migrations` | EF Core migrations; Claude never runs `database update` |
 | rule | `testing` | xUnit conventions, naming, fixtures, what to test |
 | rule | `validation-authorization` | Validators and policy-based authorization |
@@ -150,6 +150,29 @@ Existing files are never overwritten unless you pass `-Force`. After copying:
 
 `decomment`, `techdebt` and `grill` deliberately have no `disable-model-invocation`, so `/ship`
 can invoke them. `commit-push-pr` stays manual-only, so `/ship` reads its file instead.
+
+## Global hooks
+
+Enabled in `home/settings.json`:
+
+- `guard-secrets.ps1` blocks reads of secret files and secret-dumping shell commands.
+- `git-guard.ps1` enforces the git branch policy on every `Bash`/`PowerShell` call:
+
+| Blocked | Why |
+|---|---|
+| Push to `main`, `master`, `origin/HEAD` or `CLAUDE_GIT_PROTECTED` (also `HEAD:main`, `--all`, `--mirror`) | Protected branches change only via PR |
+| Plain `git push` from a branch whose upstream is a protected branch | It would land on main |
+| `push -f`, `--force-with-lease`, `+refspec`, `switch -C`, `checkout -B`, `branch -f` | No force of any kind |
+| New branch not from the local main, from `origin/<x>`, or with `--track` | The upstream must never be `origin/main` |
+| New branch while local main differs from `origin/main` (checked with `git fetch`) | Branch only after a pull |
+| `branch -u` / `--set-upstream-to` a protected branch | Same reason |
+
+Expected flow: `git switch main`, then `git pull --ff-only` as a separate command, then
+`git switch -c feature/<slug>` and `git push -u origin HEAD`. The hook checks the repo state
+*before* a command runs, so `switch main && pull && switch -c x` in one call is blocked.
+Extra protected branches (e.g. `develop,staging`) go in the `CLAUDE_GIT_PROTECTED` environment
+variable, comma-separated. The hook is a guard rail for Claude, not a replacement for server-side
+branch policies.
 
 ## Optional hooks
 

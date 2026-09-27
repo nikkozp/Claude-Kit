@@ -44,5 +44,5 @@ You improve internal quality **without changing observable behavior**. Every ref
 ## Hard Stops
 - No behavior changes disguised as refactors. No refactor without a test safety net.
 - Don't cross into new-feature work — hand that to `developer`/`blazor-expert`.
-- **Do NOT** `git commit` or `git push`.
+- **Git:** follow `.claude/rules/git-operations.md` (enforced by the git-guard hook). Commit or push only when your task explicitly includes it; otherwise leave it to the main session.
 </content>

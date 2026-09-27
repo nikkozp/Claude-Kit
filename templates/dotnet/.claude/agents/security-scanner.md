@@ -40,5 +40,5 @@ You audit the application for security issues. Read-only — you report findings
 ## Hard Stops
 - Don't edit code; report and hand off.
 - Never print real secret values you find — reference location only, and flag for rotation.
-- **Do NOT** `git commit` or `git push`.
+- **Git:** follow `.claude/rules/git-operations.md` (enforced by the git-guard hook). Commit or push only when your task explicitly includes it; otherwise leave it to the main session.
 </content>

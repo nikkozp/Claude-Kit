@@ -3,7 +3,7 @@ name: babysit
 description: Keep my open Azure DevOps PRs healthy - address review comments, rebase, fix failing CI.
 disable-model-invocation: true
 allowed-tools: Bash(az repos pr *) Bash(az devops invoke *) Bash(git fetch *) Bash(git checkout *)
-  Bash(git rebase *) Bash(git push --force-with-lease *) Bash(dotnet build *) Bash(dotnet test *)
+  Bash(git merge *) Bash(git commit *) Bash(git push *) Bash(dotnet build *) Bash(dotnet test *)
   Read Edit Grep Glob
 ---
 Run this only in a dedicated worktree session (`claude --worktree`), never in my working copy.
@@ -14,7 +14,8 @@ Run this only in a dedicated worktree session (`claude --worktree`), never in my
 For each PR, in order:
 1. Policies: `az repos pr policy list --id <id>`. If the build policy failed, read the failure,
    fix it on the PR branch, verify locally with dotnet build/test.
-2. If the branch is behind target: fetch, rebase, rerun tests, `git push --force-with-lease`.
+2. If the branch is behind target: `git fetch origin`, `git merge origin/<target>`, rerun tests,
+   then a normal `git push`. Never rebase a pushed branch and never force push (git-guard blocks it).
 3. Active review threads (REST via `az devops invoke --area git --resource pullRequestThreads`):
    - clear change request -> implement it and reply in the thread with what changed;
    - question or disagreement -> do NOT change code, add it to the report for me.

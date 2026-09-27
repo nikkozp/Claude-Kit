@@ -13,10 +13,17 @@
       "Bash(dotnet format *)",
       "Bash(git status *)",
       "Bash(git diff *)",
-      "Bash(git log *)"
+      "Bash(git log *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git fetch *)",
+      "Bash(git pull *)",
+      "Bash(git switch *)",
+      "Bash(git merge *)",
+      "Bash(git stash *)",
+      "Bash(git push *)"
     ],
     "ask": [
-      "Bash(git push *)",
       "Bash(dotnet ef database update *)",
       "Bash(az *)",
       "Bash(curl *)"
@@ -49,6 +56,21 @@
               "& \"$env:USERPROFILE\\.claude\\hooks\\guard-secrets.ps1\"; exit $LASTEXITCODE"
             ],
             "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe",
+            "args": [
+              "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass",
+              "-Command",
+              "& \"$env:USERPROFILE\\.claude\\hooks\\git-guard.ps1\"; exit $LASTEXITCODE"
+            ],
+            "timeout": 30
           }
         ]
       }

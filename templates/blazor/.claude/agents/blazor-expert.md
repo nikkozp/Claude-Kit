@@ -82,4 +82,4 @@ Missing either causes a runtime failure in exactly one phase — the kind of bug
 - Add bUnit tests for non-trivial components.
 - Need a new API call or query? Hand off to `developer` via `SendMessage`.
 - Need a UX/accessibility judgment call? Hand off to `uiux-designer`.
-- **DO NOT** `git commit` or `git push`.
+- **Git:** follow `.claude/rules/git-operations.md` (enforced by the git-guard hook). Commit or push only when your task explicitly includes it; otherwise leave it to the main session.

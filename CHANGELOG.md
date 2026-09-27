@@ -10,6 +10,21 @@ and the kit uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html):
 
 ## [Unreleased]
 
+### Added
+- `home/hooks/git-guard.ps1`, a global PreToolUse hook for `Bash`/`PowerShell`. It blocks pushes to
+  protected branches, force of any kind, branches not created from the freshly pulled local main,
+  `--track`/`origin/*` start points, and upstreams pointing at a protected branch.
+  Extra protected branches can be listed in `CLAUDE_GIT_PROTECTED`.
+
+### Changed
+- Git policy: Claude may now commit and push feature branches. `git-operations` rule, `workflow`
+  rule, all agents, `home/CLAUDE.md` and the README describe the enforced flow.
+- `home/settings.json` and the dotnet template allow git add/commit/fetch/pull/switch/merge/push
+  without a prompt; the hook does the policing.
+- `babysit` catches up with `git merge origin/<target>` and a normal push instead of rebase plus
+  `--force-with-lease`.
+- `commit-push-pr` pulls main as a separate step before creating the feature branch.
+
 ## [1.0.0] - 2026-09-27
 
 ### Added

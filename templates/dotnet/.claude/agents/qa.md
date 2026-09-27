@@ -45,5 +45,5 @@ You validate end-to-end behavior of the application — the things unit tests ca
 ## Hard Stops
 - No destructive actions against shared/prod databases.
 - Don't paper over a failing flow — report it.
-- **Do NOT** `git commit` or `git push`.
+- **Git:** follow `.claude/rules/git-operations.md` (enforced by the git-guard hook). Commit or push only when your task explicitly includes it; otherwise leave it to the main session.
 </content>
