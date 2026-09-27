@@ -15,6 +15,11 @@ and the kit uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html):
   protected branches, force of any kind, branches not created from the freshly pulled local main,
   `--track`/`origin/*` start points, and upstreams pointing at a protected branch.
   Extra protected branches can be listed in `CLAUDE_GIT_PROTECTED`.
+- `git-guard` enforces branch names `<feature|fix|chore>/<task>_<short-description>`, where the
+  task is a work item id, a Jira key or `NO-TASK`, on create and `branch -m`, and blocks `branch -M`.
+  `CLAUDE_GIT_BRANCH_PATTERN` overrides the regex.
+- Loop commands for Azure DevOps: `post-merge-sweeper`, `pr-pruner`, `fix-workitem`,
+  `triage-feedback`, `test-and-fix`, `flaky`, `review-pr`, `weekly-sync`, and a "Loops" README section.
 
 ### Changed
 - Git policy: Claude may now commit and push feature branches. `git-operations` rule, `workflow`

@@ -12,7 +12,9 @@ arguments: [workitem]
 - Recent commits: !`git log --oneline -5`
 
 1. If on main/master: `git pull --ff-only` as its own command (stash first if the tree is dirty,
-   `git stash pop` after), then `git switch -c feature/<short-name>` with no start point.
+   `git stash pop` after), then `git switch -c <type>/<task>_<short-description>` with no start
+   point: `<type>` is `feature`, `fix` or `chore`, `<task>` is $workitem or `NO-TASK`,
+   e.g. `feature/12345_order-export`.
    Never branch from `origin/main` or with `--track`; git-guard blocks both.
 2. Run `dotnet build -warnaserror` and the tests related to the change. If red, stop and report.
 3. Stage only files related to this change. Never `git add .`.

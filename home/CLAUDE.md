@@ -30,7 +30,10 @@ Good: // SAP sends empty orders on retries; they must be ignored, not rejected (
 ## Git
 Commit and push are allowed; `~/.claude/hooks/git-guard.ps1` enforces the rules below.
 - New work: `git switch main`, then `git pull --ff-only` as a separate command, then
-  `git switch -c feature/<slug>` (no start point, never `origin/main`, never `--track`).
+  `git switch -c <type>/<task>_<short-description>` (no start point, never `origin/main`,
+  never `--track`). `<type>` is `feature`, `fix` or `chore`; `<task>` is the work item id
+  (`12345`), the Jira key (`ABC-123`) or `NO-TASK`; the description is lower-case kebab-case.
+  Example: `feature/12345_order-export`.
 - First push `git push -u origin HEAD`. Never push to main/master/the default branch.
 - No force of any kind (push -f/--force-with-lease, switch -C, checkout -B, branch -f).
   To catch up with main: `git fetch origin` + `git merge origin/main`, not rebase.

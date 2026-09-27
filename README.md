@@ -202,14 +202,20 @@ Enabled in `home/settings.json`:
 |---|---|
 | Push to `main`, `master`, `origin/HEAD` or `CLAUDE_GIT_PROTECTED` (also `HEAD:main`, `--all`, `--mirror`) | Protected branches change only via PR |
 | Plain `git push` from a branch whose upstream is a protected branch | It would land on main |
-| `push -f`, `--force-with-lease`, `+refspec`, `switch -C`, `checkout -B`, `branch -f` | No force of any kind |
+| `push -f`, `--force-with-lease`, `+refspec`, `switch -C`, `checkout -B`, `branch -f`, `branch -M` | No force of any kind |
+| New or renamed branch not named `<feature\|fix\|chore>/<task>_<short-description>` | One naming scheme, every branch linked to a task |
 | New branch not from the local main, from `origin/<x>`, or with `--track` | The upstream must never be `origin/main` |
 | New branch while local main differs from `origin/main` (checked with `git fetch`) | Branch only after a pull |
 | `branch -u` / `--set-upstream-to` a protected branch | Same reason |
 
 Expected flow: `git switch main`, then `git pull --ff-only` as a separate command, then
-`git switch -c feature/<slug>` and `git push -u origin HEAD`. The hook checks the repo state
-*before* a command runs, so `switch main && pull && switch -c x` in one call is blocked.
+`git switch -c feature/<task>_<short-description>` and `git push -u origin HEAD`. The hook checks
+the repo state *before* a command runs, so `switch main && pull && switch -c x` in one call is blocked.
+
+Branch names: `<task>` is the Azure DevOps work item id (`12345`), a Jira key (`ABC-123`) or
+`NO-TASK`; the description is lower-case kebab-case. Examples: `feature/12345_order-export`,
+`fix/ABC-123_null-customer-name`, `chore/NO-TASK_bump-deps`. A project with a different scheme can
+set a regex in the `CLAUDE_GIT_BRANCH_PATTERN` environment variable.
 Extra protected branches (e.g. `develop,staging`) go in the `CLAUDE_GIT_PROTECTED` environment
 variable, comma-separated. The hook is a guard rail for Claude, not a replacement for server-side
 branch policies.

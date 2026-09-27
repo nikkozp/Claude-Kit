@@ -4,6 +4,7 @@
 #   - a branch whose upstream is a protected branch cannot be pushed implicitly
 #   - new branches start only from the local main branch, and only when it equals origin/main
 #     after a fresh fetch; never from origin/<x> and never with --track
+#   - new and renamed branches match <type>/<task>_<slug> ($env:CLAUDE_GIT_BRANCH_PATTERN overrides)
 # Exit 2 blocks the tool call and shows stderr to Claude. Git flags are case-sensitive,
 # hence the -c* operators. ASCII-only: Windows PowerShell 5.1 reads BOM-less .ps1 as ANSI.
 [Console]::InputEncoding = [Text.Encoding]::UTF8
@@ -99,7 +100,15 @@ function Check-Push([string]$dir, [string[]]$a) {
   }
 }
 
-function Check-NewBranch([string]$dir, [string]$start) {
+function Check-BranchName([string]$name) {
+  $pattern = if ($env:CLAUDE_GIT_BRANCH_PATTERN) { $env:CLAUDE_GIT_BRANCH_PATTERN } else { '^(feature|fix|chore)/(NO-TASK|[0-9]+|[A-Z][A-Z0-9_]*-[0-9]+)_[a-z0-9]+(-[a-z0-9]+)*$' }
+  if ($name -cnotmatch $pattern) {
+    Deny "branch name '$name' does not match $pattern. Use <feature|fix|chore>/<task>_<short-description>, where <task> is the work item id (12345), the Jira key (ABC-123) or NO-TASK, e.g. feature/12345_order-export."
+  }
+}
+
+function Check-NewBranch([string]$dir, [string]$name, [string]$start) {
+  Check-BranchName $name
   $main = Get-MainName $dir
   $how  = "Run 'git switch $main' and 'git pull --ff-only' as a separate command first, then 'git switch -c <name>' with no start point."
   if ($start) {
@@ -131,12 +140,12 @@ function Check-Branch([string]$dir, [string]$sub, [string[]]$a) {
     'checkout' {
       if ($flags -ccontains '-B') { Deny 'checkout -B force-resets a branch and is forbidden.' }
       $i = [array]::IndexOf($a, '-b')
-      if ($i -ge 0) { $p = @(Get-Positional (After $a ($i + 1))); Check-NewBranch $dir ($(if ($p.Count) { $p[0] } else { '' })) }
+      if ($i -ge 0) { $p = @(Get-Positional (After $a ($i + 1))); Check-NewBranch $dir ([string]$a[$i + 1]) ($(if ($p.Count) { $p[0] } else { '' })) }
     }
     'switch' {
       if ($flags -ccontains '-C' -or $flags -ccontains '--force-create') { Deny 'switch -C force-resets a branch and is forbidden.' }
       $i = [array]::IndexOf($a, '-c'); if ($i -lt 0) { $i = [array]::IndexOf($a, '--create') }
-      if ($i -ge 0) { $p = @(Get-Positional (After $a ($i + 1))); Check-NewBranch $dir ($(if ($p.Count) { $p[0] } else { '' })) }
+      if ($i -ge 0) { $p = @(Get-Positional (After $a ($i + 1))); Check-NewBranch $dir ([string]$a[$i + 1]) ($(if ($p.Count) { $p[0] } else { '' })) }
     }
     'branch' {
       $prot = Get-Protected $dir
@@ -149,10 +158,16 @@ function Check-Branch([string]$dir, [string]$sub, [string[]]$a) {
         }
       }
       if ($flags | Where-Object { $_ -cmatch '^(-f|--force)$' }) { Deny 'branch -f force-resets a branch and is forbidden.' }
+      if ($flags -ccontains '-M') { Deny 'branch -M force-renames over an existing branch and is forbidden. Use -m.' }
+      if ($flags | Where-Object { $_ -cmatch '^(-m|--move)$' }) {
+        $p = @(Get-Positional $a)
+        if ($p.Count -ge 1) { Check-BranchName $p[-1] }
+        return
+      }
       $nonCreate = '^(-[dDmMcClarvu]|-vv|--(delete|move|copy|list|all|remotes|show-current|verbose|contains|no-contains|merged|no-merged|edit-description|unset-upstream|set-upstream-to|format|sort|points-at|column|no-column|color|no-color|abbrev|no-abbrev|ignore-case))'
       if ($flags | Where-Object { $_ -cmatch $nonCreate }) { return }
       $p = @(Get-Positional $a)
-      if ($p.Count -ge 1) { Check-NewBranch $dir ($(if ($p.Count -ge 2) { $p[1] } else { '' })) }
+      if ($p.Count -ge 1) { Check-NewBranch $dir $p[0] ($(if ($p.Count -ge 2) { $p[1] } else { '' })) }
     }
     'worktree' {
       if ($a.Count -and $a[0] -ceq 'add') {
@@ -161,7 +176,7 @@ function Check-Branch([string]$dir, [string]$sub, [string[]]$a) {
         if ($i -ge 0) {
           $rest = @(@(After $a 0) | Where-Object { $_ -ne $a[$i + 1] })
           $p = @(Get-Positional $rest)
-          Check-NewBranch $dir ($(if ($p.Count -ge 2) { $p[1] } else { '' }))
+          Check-NewBranch $dir ([string]$a[$i + 1]) ($(if ($p.Count -ge 2) { $p[1] } else { '' }))
         }
       }
     }

@@ -6,7 +6,11 @@ CI pipeline; swap in your actual host and pipeline tool where noted.
 ## Branching
 - Long-lived: `main`/`master` (production), `staging` or `develop` (integration) if your repo uses one.
   Nobody pushes to them directly; they change only through PRs.
-- Work branches: `feature/<slug>`, `fix/<slug>`, `chore/<slug>`, always created from the freshly pulled main branch.
+- Work branches: `<type>/<task>_<short-description>`, always created from the freshly pulled main branch.
+  - `<type>`: `feature`, `fix` or `chore`.
+  - `<task>`: the work item id (`12345`), the Jira key (`ABC-123`), or `NO-TASK` when there is none.
+  - `<short-description>`: lower-case kebab-case.
+  - Examples: `feature/12345_order-export`, `fix/ABC-123_null-customer-name`, `chore/NO-TASK_bump-deps`.
 
 ## Commits — Conventional Commits
 Format: `<type>(<scope>): <subject>`
@@ -26,10 +30,10 @@ Commit, push, pull and fetch are allowed. The policy below is enforced by the gl
 **Mandatory flow for new work:**
 1. `git switch main`, then `git pull --ff-only` — as a **separate** command (the hook checks the
    state before a command runs, so a chained `switch && pull && switch -c` is blocked).
-2. `git switch -c feature/<slug>` — no start point, no `--track`. Never `git switch -c x origin/main`:
+2. `git switch -c feature/<task>_<short-description>` — no start point, no `--track`. Never `git switch -c x origin/main`:
    a remote start point becomes the upstream, and a plain `git push` would then target main.
 3. Commit in small Conventional Commits. First push: `git push -u origin HEAD`
-   (upstream becomes `origin/feature/<slug>`).
+   (upstream becomes `origin/feature/<task>_<short-description>`).
 4. To pick up new main: `git fetch origin`, then `git merge origin/main`, then a normal `git push`.
 
 **FORBIDDEN (blocked by the hook):**
@@ -37,6 +41,7 @@ Commit, push, pull and fetch are allowed. The policy below is enforced by the gl
   (including `HEAD:main` refspecs, `--all`, `--mirror`).
 - Any force: `push --force`/`-f`/`--force-with-lease`/`+refspec`, `switch -C`, `checkout -B`, `branch -f`.
 - Creating a branch from anything but the pulled local main, or with `--track`.
+- Creating or renaming (`branch -m`) a branch whose name breaks the pattern above; `branch -M`.
 - Setting a branch upstream to a protected branch; pushing a branch that tracks one.
 
 **Also forbidden (not machine-checked):**

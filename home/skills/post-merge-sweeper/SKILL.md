@@ -17,7 +17,7 @@ Run only in a dedicated worktree session (`claude --worktree`).
    needs a design decision go to the report, not to code.
 4. No actionable items -> answer "Nothing to sweep" and stop.
 5. Create the branch from the freshly pulled local main: `git switch main`, then
-   `git pull --ff-only` as a separate command, then `git switch -c chore/post-merge-sweep-<yyyymmdd>`
+   `git pull --ff-only` as a separate command, then `git switch -c chore/NO-TASK_post-merge-sweep-<yyyymmdd>`
    (no start point, never `origin/main`, never `--track`). Implement the items;
    `dotnet build -warnaserror` and related tests must be green.
 6. Read `~/.claude/skills/commit-push-pr/SKILL.md` and follow it. PR title
