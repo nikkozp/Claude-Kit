@@ -24,7 +24,9 @@ Claude-Kit/
 │   ├── settings.json          global config (Windows)
 │   ├── CLAUDE.md              global rules: accuracy, comments, compaction
 │   ├── skills/                ship, babysit, commit-push-pr, techdebt, grill,
-│   │                          decomment, wrap-up, skill-map
+│   │                          decomment, wrap-up, skill-map, post-merge-sweeper,
+│   │                          pr-pruner, fix-workitem, triage-feedback, test-and-fix,
+│   │                          flaky, review-pr, weekly-sync
 │   ├── agents/                security-reviewer
 │   ├── hooks/                 guard-secrets.ps1, git-guard.ps1, comment-guard.ps1 (optional)
 │   └── scripts/               skill-map.ps1
@@ -141,15 +143,53 @@ Existing files are never overwritten unless you pass `-Force`. After copying:
 |---|---|
 | `/ship <workitem>` | Runs decomment, techdebt, grill, then commit-push-pr. Stops at the first problem |
 | `/commit-push-pr <workitem>` | Commits, pushes and opens an Azure DevOps PR |
-| `/babysit` | Looks after your PRs: review comments, rebase, CI. Run it in a separate `claude --worktree` session, looped with `/loop 10m /babysit` |
+| `/babysit` | Looks after your PRs: review comments, merge from the target branch, CI. Run it in a separate `claude --worktree` session, looped with `/loop 10m /babysit` |
 | `/grill` | Adversarial review of the branch in a forked context |
 | `/techdebt` | Finds duplication, dead code and debug leftovers |
 | `/decomment` | Removes low-value comments from the diff |
 | `/wrap-up` | Summarizes the session and proposes CLAUDE.md changes |
 | `/skill-map` | Draws a Mermaid map of skills and highlights broken links |
+| `/post-merge-sweeper` | Collects review comments on your PRs merged in the last 7 days and fixes them in one follow-up PR |
+| `/pr-pruner` | Abandons your drafts idle for 30+ days and reports PRs idle for 14+ days |
+| `/fix-workitem <id>` | Takes an Azure Boards work item from acceptance criteria to tests, fix and a draft PR |
+| `/triage-feedback` | Turns work items tagged `claude-ready` into draft PRs, at most 2 per run |
+| `/test-and-fix [filter]` | Runs the tests and fixes failures at the root cause, at most 3 iterations |
+| `/flaky <filter> [runs]` | Reruns a flaky test, finds the nondeterminism and fixes it without retries |
+| `/review-pr <id>` | Reviews a teammate's PR against `REVIEW.md` without posting anything |
+| `/weekly-sync` | Briefs your last 7 days: commits, PRs, work items and risks |
 
 `decomment`, `techdebt` and `grill` deliberately have no `disable-model-invocation`, so `/ship`
 can invoke them. `commit-push-pr` stays manual-only, so `/ship` reads its file instead.
+The same applies to `fix-workitem`, which `/triage-feedback` reads. Every command that pushes,
+opens or closes a PR, or edits a work item is manual-only.
+
+## Loops
+
+Run each loop in its own session with its own worktree (`claude --worktree`), so the agent never
+switches branches in your working copy.
+
+| Session | Command | What it does |
+|---|---|---|
+| babysitter | `/loop 10m /babysit` | Review comments, merge from the target branch and CI for your PRs |
+| feedback | `/loop 30m /triage-feedback` | Work items tagged `claude-ready` become draft PRs |
+| sweeper | `/loop 2h /post-merge-sweeper` | Comments left after merge become a follow-up PR |
+| pruner | `/loop 6h /pr-pruner` | Abandons stale drafts, reports the rest |
+| reviewer | `/loop 20m /review-pr <id>` | Watches a teammate's PR and reviews new commits |
+
+For sessions that push, add this to the project's `.claude/settings.local.json`:
+
+```json
+{ "permissions": {
+    "allow": ["Bash(git push -u origin HEAD)"],
+    "deny":  ["Bash(git push * main)", "Bash(git push * master)"] } }
+```
+
+Force pushes are not allowed in loops either: `git-guard.ps1` blocks them, and `babysit` catches
+up with a merge instead of a rebase.
+
+Every command has a per-run limit and a stop condition. Stop a loop with `Esc` or by closing the
+session. To keep a loop running after the terminal closes, move it to `/schedule` or a routine.
+Run each command by hand for a week before you put it in a loop.
 
 ## Global hooks
 
