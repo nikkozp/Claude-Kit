@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build *)",
+      "Bash(dotnet test *)",
+      "Bash(dotnet format *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)"
+    ],
+    "deny": [
+      "Bash(git push * main)",
+      "Bash(git push * master)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe",
+            "args": [
+              "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command",
+              "& \"$env:CLAUDE_PROJECT_DIR\\.claude\\hooks\\format-file.ps1\"; exit $LASTEXITCODE"
+            ],
+            "timeout": 60
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe",
+            "args": [
+              "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command",
+              "& \"$env:CLAUDE_PROJECT_DIR\\.claude\\hooks\\tests-gate.ps1\"; exit $LASTEXITCODE"
+            ],
+            "timeout": 600
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "csharp-lsp@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true,
+    "pr-review-toolkit@claude-plugins-official": true
+  }
+}

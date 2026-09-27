@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "model": "opus",
+  "effortLevel": "medium",
+  "language": "Ukrainian",
+  "autoUpdatesChannel": "stable",
+  "promptCacheTtl": "1h",
+  "permissions": {
+    "defaultMode": "plan",
+    "allow": [
+      "Bash(dotnet build *)",
+      "Bash(dotnet test *)",
+      "Bash(dotnet format *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "Bash(dotnet ef database update *)",
+      "Bash(az *)",
+      "Bash(curl *)"
+    ],
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/appsettings.*.local.json)",
+      "Read(**/secrets.json)",
+      "Read(**/*.pfx)",
+      "Read(**/*.pem)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.azure/**)",
+      "Read(~/AppData/Roaming/Microsoft/UserSecrets/**)",
+      "Read(~/AppData/Roaming/NuGet/**)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Grep|Glob|Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe",
+            "args": [
+              "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass",
+              "-Command",
+              "& \"$env:USERPROFILE\\.claude\\hooks\\guard-secrets.ps1\"; exit $LASTEXITCODE"
+            ],
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe",
+            "args": [
+              "-NoProfile", "-NonInteractive", "-Command",
+              "(New-Object Media.SoundPlayer 'C:\\Windows\\Media\\Windows Notify.wav').PlaySync()"
+            ],
+            "timeout": 5,
+            "async": true
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "cols=${COLUMNS:-}; case \"$cols\" in \"\"|*[!0-9]*) cols=$(stty size </dev/tty 2>/dev/null | awk '{print $2}');; esac; case \"$cols\" in \"\"|*[!0-9]*) cols=120;; esac; export COLUMNS=$(( cols > 4 ? cols - 4 : 1 )); plugin_dir=$(ls -1d \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}\"/plugins/cache/*/claude-hud/*/ 2>/dev/null | sort -V | tail -1); exec node \"${plugin_dir}dist/index.js\""
+  },
+  "enabledPlugins": {
+    "context7@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "claude-hud@claude-hud": true,
+    "github@claude-plugins-official": true,
+    "code-review@claude-plugins-official": false,
+    "code-simplifier@claude-plugins-official": false,
+    "frontend-design@claude-plugins-official": false,
+    "playwright@claude-plugins-official": false,
+    "skill-creator@claude-plugins-official": false,
+    "claude-md-management@claude-plugins-official": false,
+    "figma@claude-plugins-official": false
+  },
+  "extraKnownMarketplaces": {
+    "claude-hud": {
+      "source": { "source": "github", "repo": "jarrodwatts/claude-hud" },
+      "autoUpdate": false
+    }
+  },
+  "theme": "auto",
+  "editorMode": "normal",
+  "showTurnDuration": true,
+  "teammateMode": "auto",
+  "useAutoModeDuringPlan": true,
+  "env": {
+    "CLAUDE_CODE_DISABLE_1M_CONTEXT": "1",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet",
+    "BASH_MAX_OUTPUT_LENGTH": "30000",
+    "MAX_MCP_OUTPUT_TOKENS": "10000"
+  }
+}
