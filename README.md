@@ -26,14 +26,14 @@ Claude-Kit/
 │   ├── skills/                ship, babysit, commit-push-pr, techdebt, grill,
 │   │                          decomment, wrap-up, skill-map, post-merge-sweeper,
 │   │                          pr-pruner, fix-workitem, triage-feedback, test-and-fix,
-│   │                          flaky, review-pr, weekly-sync
+│   │                          flaky, review-pr, weekly-sync, feature
 │   ├── agents/                security-reviewer
 │   ├── hooks/                 guard-secrets.ps1, git-guard.ps1, comment-guard.ps1 (optional)
 │   └── scripts/               skill-map.ps1
 └── templates/
     ├── dotnet/                .claude/ (settings, hooks, agents, rules, skills) + CLAUDE.md
     ├── blazor/                add-on for Blazor UI: agents, rule, skills
-    ├── sdlc/                  intent.md, spec.md, plan.md templates and review.md
+    ├── sdlc/                  docs/sdlc/review.md (code review policy)
     └── knowledge/             raw/ + wiki/ knowledge base skeleton
 ```
 
@@ -151,6 +151,7 @@ Existing files are never overwritten unless you pass `-Force`. After copying:
 | `/skill-map` | Draws a Mermaid map of skills and highlights broken links |
 | `/post-merge-sweeper` | Collects review comments on your PRs merged in the last 7 days and fixes them in one follow-up PR |
 | `/pr-pruner` | Abandons your drafts idle for 30+ days and reports PRs idle for 14+ days |
+| `/feature [id]` | Azure Boards work item (or a description) -> branch -> superpowers brainstorming, plan and execution -> draft PR |
 | `/fix-workitem <id>` | Takes an Azure Boards work item from acceptance criteria to tests, fix and a draft PR |
 | `/triage-feedback` | Turns work items tagged `claude-ready` into draft PRs, at most 2 per run |
 | `/test-and-fix [filter]` | Runs the tests and fixes failures at the root cause, at most 3 iterations |
@@ -162,6 +163,9 @@ Existing files are never overwritten unless you pass `-Force`. After copying:
 can invoke them. `commit-push-pr` stays manual-only, so `/ship` reads its file instead.
 The same applies to `fix-workitem`, which `/triage-feedback` reads. Every command that pushes,
 opens or closes a PR, or edits a work item is manual-only.
+Design and planning are left to the superpowers plugin (`brainstorming` -> `writing-plans` ->
+execution, files under `docs/superpowers/`); the kit ships no spec or plan templates of its own,
+and `/feature` only adds the work item, the branch and the draft PR around that flow.
 
 ## Loops
 
