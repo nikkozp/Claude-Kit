@@ -1,14 +1,14 @@
 # Review policy (read by review agents)
 
 ## Flag
-- Correctness bugs, broken requirements from spec.md
+- Correctness bugs, broken requirements from the work item or the design doc (`docs/superpowers/specs/`)
 - Security: authz, injection, secrets, unsafe deserialization
 - Data safety: migrations, money arithmetic, idempotency
 - Missing tests for new behavior
 
 ## Do not flag
 - Formatting and style (the formatter and analyzers own this)
-- Hypothetical edge cases that the spec rules out
+- Hypothetical edge cases that the design rules out
 - Extra abstractions "for the future"
 
 ## Output

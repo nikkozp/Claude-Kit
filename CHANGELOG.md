@@ -20,6 +20,8 @@ and the kit uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html):
   `CLAUDE_GIT_BRANCH_PATTERN` overrides the regex.
 - Loop commands for Azure DevOps: `post-merge-sweeper`, `pr-pruner`, `fix-workitem`,
   `triage-feedback`, `test-and-fix`, `flaky`, `review-pr`, `weekly-sync`, and a "Loops" README section.
+- `feature` command: Azure Boards work item (or a description) -> branch -> superpowers
+  brainstorming, plan and execution -> draft PR.
 
 ### Changed
 - Git policy: Claude may now commit and push feature branches. `git-operations` rule, `workflow`
@@ -29,6 +31,10 @@ and the kit uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html):
 - `babysit` catches up with `git merge origin/<target>` and a normal push instead of rebase plus
   `--force-with-lease`.
 - `commit-push-pr` pulls main as a separate step before creating the feature branch.
+
+### Removed
+- `templates/sdlc` intent / spec / plan templates. The superpowers plugin owns design and planning
+  (`docs/superpowers/specs`, `docs/superpowers/plans`); `templates/sdlc` keeps only the review policy.
 
 ## [1.0.0] - 2026-09-27
 
